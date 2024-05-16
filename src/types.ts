@@ -21,7 +21,7 @@ export type UseApiResponse = {
   submitApi: UseApiSubmit
 }
 
-export type FetchData = (endpoint: string, identifier?: number | string) => void
+export type FetchData = (endpoint: string) => void
 
 export type Mutate = UseApiSubmit
 
