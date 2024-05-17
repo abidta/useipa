@@ -1,4 +1,4 @@
-[![npm version](https://badgen.net/npm/v/useipa)](https://www.npmjs.org/package/useipa)
+[![npm version](https://img.shields.io/npm/v/useipa.svg?style=flat-square)](https://www.npmjs.org/package/useipa)
 
 # useipa Package
 
