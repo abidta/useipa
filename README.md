@@ -1,5 +1,6 @@
 [![npm version](https://img.shields.io/npm/v/useipa.svg?style=flat-square)](https://www.npmjs.org/package/useipa)
-
+ &nbsp;
+[![Build status](https://img.shields.io/github/actions/workflow/status/abidta/useipa/CI.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/abidta/useipa/actions/workflows/ci.yml)
 # useipa Package
 
 The `useipa` package provides custom hooks for API interaction in React applications using Axios. It includes hooks for fetching data, mutating data, and submitting forms with integrated state management for loading, success, and error states.
