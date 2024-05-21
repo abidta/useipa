@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { AxiosResponse } from 'axios'
 import { FetchData, Mutate, UseApi, UseApiSubmit, UseForm, UseFormResponse } from './types'
-import axios, { type AxiosInstance } from 'axios'
+import axios, { AxiosInstance } from 'axios'
+import { abortSignal } from './helper'
 
-const api: AxiosInstance = axios.create()
+export const api: AxiosInstance = axios.create()
 api.interceptors.response.use(
   (response) => {
     return response
@@ -51,7 +52,9 @@ export const useApi: UseApi = () => {
         data: body,
         headers: headers,
         withCredentials: true,
+        signal: abortSignal(1000),
       })
+
       if (response) {
         setSuccess(true)
         setData(response)
