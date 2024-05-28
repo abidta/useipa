@@ -19,7 +19,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - name: remove
         run: rm -rf node_modules package-lock.json
-        
+
       - name: Install dependencies
         run: npm install
 

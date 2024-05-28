@@ -1,7 +1,9 @@
 [![npm version](https://img.shields.io/npm/v/useipa.svg?style=flat-square)](https://www.npmjs.org/package/useipa)
- &nbsp;
+&nbsp;
 [![Build status](https://img.shields.io/github/actions/workflow/status/abidta/useipa/CI.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/abidta/useipa/actions/workflows/ci.yml)
-# useipa Package 
+
+# useipa Package
+
 ### A Powerful and Lightweight React Hook for Managing API Calls and Forms
 
 The `useipa` package provides custom hooks for API interaction in React applications using Axios. It includes hooks for fetching data, mutating data, and submitting forms with integrated state management for loading, success, and error states.
@@ -69,11 +71,7 @@ const MutateComponent = () => {
 
   return (
     <div>
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-      />
+      <input type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
       <button onClick={handleSubmit}>Submit</button>
       {success && <p>Success!</p>}
       {error && <p>Error: {error.message}</p>}
@@ -93,6 +91,7 @@ export default MutateComponent
 ### `useFormApi` Hook
 
 The `useFormApi` hook is designed for handling form submissions.
+
 - Extends `useApi` with a `submitForm` method for form submissions.
 - Inherits state management for `data`,` error`, `fetching`, and `success` from `useApi`.
 
@@ -118,18 +117,8 @@ const FormComponent = () => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        name="name"
-        value={formData.name}
-        onChange={handleChange}
-      />
-      <input
-        type="email"
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-      />
+      <input type="text" name="name" value={formData.name} onChange={handleChange} />
+      <input type="email" name="email" value={formData.email} onChange={handleChange} />
       <button type="submit">Submit</button>
       {success && <p>Form submitted successfully!</p>}
       {error && <p>Error: {error.message}</p>}
@@ -153,12 +142,14 @@ export default FormComponent
 - Useful for cases where you don't need to manage state within a React component.
 
 #### Example: Async API Call
+
 ```js
 const getUsers = async () => {
-  const data = await asyncApi('/api/users');
-  console.log(data);
-};
+  const data = await asyncApi('/api/users')
+  console.log(data)
+}
 ```
+
 ### or
 
 ```jsx
@@ -199,23 +190,24 @@ export default AsyncComponent
 ### `useApi`
 
 - **State:**
+
   - `data`: The response data from the API.
   - `fetching`: A boolean indicating if the request is in progress.
   - `error`: An error object if the request fails.
   - `success`: A boolean indicating if the request was successful.
 
- **Methods:**
-  - `fetchData(endpoint, config?)`: Fetches data from an API endpoint.
-    - `endpoint`: The URL of the API endpoint.
-    - `config `(optional): An object containing configuration options like headers or method (defaults to `GET`).
-<br>
+  **Methods:**
+
+  - `fetchData(endpoint, config?)`: Fetches data from an API endpoint. - `endpoint`: The URL of the API endpoint. - `config `(optional): An object containing configuration options like headers or method (defaults to `GET`).
+    <br>
 
   - `mutate(endpoint, data, config?)`: Mutates data on an API endpoint.
+
     - `endpoint`: The URL of the API endpoint.
     - `data`: The data to be sent for mutation.
     - `config` (optional): An object containing configuration options like headers or method (defaults to `POST`).
- <br>
- 
+      <br>
+
   - `submitApi(endpointOrConfig, config?)` (internal method): Handles the actual API request.
     - `endpointOrConfig`: Either a string representing the endpoint URL or a configuration object.
     - `config `(optional): Additional configuration options for the request.
@@ -230,6 +222,7 @@ export default AsyncComponent
 ### `asyncApi`
 
 - **Parameters:**
+
   - `endpoint: string`: The API endpoint to call.
   - `method?: string`: The HTTP method to use (default is 'GET').
   - `config?: RequestConfig`: Additional configuration options for the request
@@ -245,10 +238,11 @@ const config = {
   headers: {
     Authorization: `Bearer ${myAuthToken}`,
   },
-};
+}
 
-fetchData('/api/data', config);
+fetchData('/api/data', config)
 ```
+
 ### Error Handling
 
 `useApi` logs errors to the console by default. You can implement custom error handling in your component.
