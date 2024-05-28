@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AxiosRequestConfig, Method } from 'axios'
+import { AxiosRequestConfig } from 'axios'
 
 export type UseForm = () => UseFormResponse
 
@@ -11,9 +11,9 @@ export type UseFormResponse = {
 /**
  * Use api types
  */
-export type UseApiResponse = {
+export type UseApiResponse<D = any> = {
   fetching: boolean
-  data: any
+  data: D
   error?: Error | null
   success: boolean
   fetchData: FetchData
@@ -21,18 +21,19 @@ export type UseApiResponse = {
   submitApi: UseApiSubmit
 }
 
-export type FetchData = (endpoint: string) => void
+export type FetchData = (endpoint: string, config?: RequestConfig) => void
 
-export type Mutate = UseApiSubmit
+export type Mutate = (endpoint: string, data?: any, config?: RequestConfig) => void
 
 type SubmitForm = (endpoint: string, inputData: object) => void
 
-export type UseApiSubmit<D = any> = (
-  endpoint: string,
-  body?: D,
-  method?: Method,
-  params?: any,
-  headers?: AxiosRequestConfig['headers']
-) => void
+export type RequestConfig = {
+  identifier?: string
+} & AxiosRequestConfig
+
+export type UseApiSubmit = {
+  (config: RequestConfig): void
+  (endpoint: string, config: RequestConfig): void
+}
 
 export type UseApi = () => UseApiResponse

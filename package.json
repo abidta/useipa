@@ -18,7 +18,9 @@
   },
   "scripts": {
     "test": "jest",
-    "build": "tsup "
+    "build": "tsup ",
+    "format": "prettier . --write",
+    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "repository": {
     "type": "git",
