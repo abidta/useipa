@@ -1,7 +1,8 @@
 [![npm version](https://img.shields.io/npm/v/useipa.svg?style=flat-square)](https://www.npmjs.org/package/useipa)
  &nbsp;
 [![Build status](https://img.shields.io/github/actions/workflow/status/abidta/useipa/CI.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/abidta/useipa/actions/workflows/ci.yml)
-# useipa Package
+# useipa Package 
+### A Powerful and Lightweight React Hook for Managing API Calls and Forms
 
 The `useipa` package provides custom hooks for API interaction in React applications using Axios. It includes hooks for fetching data, mutating data, and submitting forms with integrated state management for loading, success, and error states.
 
@@ -11,13 +12,20 @@ To install the package, run:
 
 ```sh
 npm install useipa
+# or
+yarn add useipa
 ```
 
 ## Usage
 
-### `useApi` Hook
+### `useApi` The Core Hook
 
 The `useApi` hook provides methods for fetching and mutating data from an API.
+Fetches data, mutates resources, and submits forms using a unified API.
+
+Provides state management for data, error, fetching, and success.
+
+Offers the following methods:
 
 #### Example: Fetching Data
 
@@ -85,6 +93,8 @@ export default MutateComponent
 ### `useFormApi` Hook
 
 The `useFormApi` hook is designed for handling form submissions.
+- Extends `useApi` with a `submitForm` method for form submissions.
+- Inherits state management for `data`,` error`, `fetching`, and `success` from `useApi`.
 
 #### Example: Form Submission
 
@@ -138,9 +148,18 @@ export default FormComponent
 
 ### `asyncApi` Function
 
-The `asyncApi` function allows for simple asynchronous API calls.
+- The `asyncApi` function allows for simple asynchronous API calls.
+- Allows making direct API calls without using the state management features of `useApi`.
+- Useful for cases where you don't need to manage state within a React component.
 
 #### Example: Async API Call
+```js
+const getUsers = async () => {
+  const data = await asyncApi('/api/users');
+  console.log(data);
+};
+```
+### or
 
 ```jsx
 import { useEffect, useState } from 'react'
@@ -185,25 +204,55 @@ export default AsyncComponent
   - `error`: An error object if the request fails.
   - `success`: A boolean indicating if the request was successful.
 
-- **Methods:**
-  - `fetchData(endpoint: string)`: Fetch data from the specified endpoint.
-  - `mutate(endpoint: string, body: object, method?: string)`: Send a mutation request (POST, PUT, DELETE, etc.) to the specified endpoint. Default is POST.
-  - `submitApi(endpoint: string, body?: object, method?: string, params?: object, headers?: object)`: A low-level function to handle API requests with detailed configurations.
+ **Methods:**
+  - `fetchData(endpoint, config?)`: Fetches data from an API endpoint.
+    - `endpoint`: The URL of the API endpoint.
+    - `config `(optional): An object containing configuration options like headers or method (defaults to `GET`).
+<br>
+
+  - `mutate(endpoint, data, config?)`: Mutates data on an API endpoint.
+    - `endpoint`: The URL of the API endpoint.
+    - `data`: The data to be sent for mutation.
+    - `config` (optional): An object containing configuration options like headers or method (defaults to `POST`).
+ <br>
+ 
+  - `submitApi(endpointOrConfig, config?)` (internal method): Handles the actual API request.
+    - `endpointOrConfig`: Either a string representing the endpoint URL or a configuration object.
+    - `config `(optional): Additional configuration options for the request.
 
 ### `useFormApi`
 
 - **State and Methods:** Inherits all state and methods from `useApi`.
 
 - **Methods:**
-  - `submitForm(endpoint: string, inputData: object)`: Submit form data to the specified endpoint using the POST method.
+  - `submitForm(endpoint: string, inputData: object,config?)`: Submit form data to the specified endpoint using the POST method.
 
 ### `asyncApi`
 
 - **Parameters:**
   - `endpoint: string`: The API endpoint to call.
   - `method?: string`: The HTTP method to use (default is 'GET').
+  - `config?: RequestConfig`: Additional configuration options for the request
 
 - **Returns:** A promise that resolves with the API response data.
+
+### Request Configuration
+
+The `createConfig` function (not directly exported) helps build request configurations. You can provide custom configurations when calling `fetchData`, `mutate`, or passing them to `submitApi` and `submitForm`:
+
+```js
+const config = {
+  headers: {
+    Authorization: `Bearer ${myAuthToken}`,
+  },
+};
+
+fetchData('/api/data', config);
+```
+### Error Handling
+
+`useApi` logs errors to the console by default. You can implement custom error handling in your component.
+The `error` property in `useApi` and `useFormApi` stores the error object for programmatic handling.
 
 ## Conclusion
 
