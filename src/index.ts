@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { AxiosResponse } from 'axios'
 import {
+  AsyncApi,
   FetchData,
   Mutate,
   RequestConfig,
   UseApi,
+  UseApiResponse,
   UseApiSubmit,
   UseForm,
   UseFormResponse,
@@ -24,11 +26,8 @@ api.interceptors.response.use(
     return Promise.reject(errObj ?? error)
   }
 )
-/**
- *
- * @returns
- */
-export const useApi: UseApi = () => {
+
+export const useApi: UseApi = <T>(): UseApiResponse<T> => {
   const [fetching, setFetching] = useState(false)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
@@ -44,11 +43,8 @@ export const useApi: UseApi = () => {
 
   /**
    *
-   * @param endpoint
-   * @param body
-   * @param method
-   * @param params
-   * @param headers
+   * @param {(string|object)} endpointOrConfig
+   * @param {RequestConfig} [config]
    */
   const submitApi: UseApiSubmit = async (
     endpointOrConfig: string | RequestConfig,
@@ -73,8 +69,6 @@ export const useApi: UseApi = () => {
         setData(response)
       }
     } catch (error) {
-      // console.log('Error =>  ', error.message)
-
       const err = error as AxiosResponse
       setError(err.data ?? err)
     } finally {
@@ -91,21 +85,18 @@ export const useApi: UseApi = () => {
     submitApi,
   }
 }
-/**
- *
- * @param endpoint
- * @returns
- */
+
 export const useFormApi: UseForm = (): UseFormResponse => {
   const { data, fetching, error, success, submitApi } = useApi()
 
   /**
    *
-   * @param endpoint
-   * @param inputData
+   * @param {string} endpoint
+   * @param {object} formData
+   * @param {RequestConfig} [config]
    */
-  const submitForm = async (endpoint: string, inputData: object, config?: RequestConfig) => {
-    submitApi(endpoint, createConfig({ ...config, data: inputData }, 'mutate'))
+  const submitForm = async (endpoint: string, formData: object, config?: RequestConfig) => {
+    submitApi(endpoint, createConfig({ ...config, data: formData }, 'mutate'))
   }
   return {
     data,
@@ -118,11 +109,16 @@ export const useFormApi: UseForm = (): UseFormResponse => {
 
 /**
  *
- * @param endpoint
- * @param method
- * @returns Promise
+ * @param {string} endpoint
+ * @param {string} [method=GET]
+ * @param {RequestConfig} [config]
+ * @returns {Promise<any>}
  */
-export const asyncApi = async (endpoint: string, method = 'GET', config: RequestConfig) => {
+export const asyncApi: AsyncApi = async (
+  endpoint: string,
+  method = 'GET',
+  config?: RequestConfig
+) => {
   const { data } = await api({ ...config, url: endpoint, method })
   return data
 }
