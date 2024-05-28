@@ -1,5 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { useApi } from '..'
+import { asyncApi, useApi, useFormApi } from '..'
 import { api } from '..'
 import MockAdapter from 'axios-mock-adapter'
 import '@testing-library/jest-dom'
@@ -11,7 +11,12 @@ const mockResponse = {
   title: 'delectus aut autem',
   completed: false,
 }
-const postResponse = { data: { message: 'User crteated' } }
+const postResponse = { data: { message: 'User created' } }
+const deleteResponse = { data: { message: 'User deleted' } }
+const formdata = new FormData()
+formdata.append('foo', 'bar')
+formdata.append('ping', 'pong')
+
 describe('UseApi', () => {
   beforeEach(() => {
     mock = new MockAdapter(api)
@@ -43,7 +48,7 @@ describe('UseApi', () => {
     })
   })
 
-  test('should handle successful API call, Mutate', async () => {
+  test('should handle successful API call, Mutate without config', async () => {
     const body = { user: { name: 'abid' } }
 
     mock.onPost('/post', body).reply(200, postResponse)
@@ -55,6 +60,19 @@ describe('UseApi', () => {
     await waitFor(() => {
       expect(result.current.success).toBe(true)
       expect(result.current.data).toEqual(postResponse)
+      expect(result.current.error).toBe(null)
+    })
+  })
+
+  test('should handle successful API call, Mutate without body, Delete Method', async () => {
+    mock.onDelete('/post?id=1', {}).reply(200, deleteResponse)
+    const { result } = renderHook(() => useApi())
+    act(() => result.current.mutate('/post?id=1', {}, { method: 'DELETE' }))
+    expect(result.current.fetching).toBe(true)
+
+    await waitFor(() => {
+      expect(result.current.success).toBe(true)
+      expect(result.current.data).toEqual(deleteResponse)
       expect(result.current.error).toBe(null)
     })
   })
@@ -71,5 +89,37 @@ describe('UseApi', () => {
       expect(result.current.data).toBeNull()
       expect(result.current.error).toBeTruthy()
     })
+  })
+})
+
+describe('UseFormApi hook', () => {
+  beforeEach(() => {
+    mock = new MockAdapter(api)
+  })
+  afterEach(() => {
+    mock.reset()
+  })
+
+  test('should handle successful Api call with submit form ', async () => {
+    mock.onPost('/submit', formdata).reply(200, postResponse)
+    const { result } = renderHook(() => useFormApi())
+
+    act(() => {
+      result.current.submitForm('/submit', formdata)
+    })
+    expect(result.current.fetching).toBe(true)
+    await waitFor(() => {
+      expect(result.current.success).toBe(true)
+      expect(result.current.data).toEqual(postResponse)
+      expect(result.current.error).toBe(null)
+    })
+  })
+})
+
+describe('asyncApi check', () => {
+  test('should success asyncApi', async () => {
+    mock.onPost('/promise').reply(200, postResponse)
+    const data = await asyncApi('/promise', 'POST', { data: postResponse })
+    expect(data).toEqual(postResponse)
   })
 })
