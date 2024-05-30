@@ -122,5 +122,3 @@ export const asyncApi: AsyncApi = async (
   const { data } = await api({ ...config, url: endpoint, method })
   return data
 }
-
-export default useApi
