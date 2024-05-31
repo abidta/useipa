@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AxiosInstance, AxiosRequestConfig, Method } from 'axios'
+import { AxiosRequestConfig, CreateAxiosDefaults, Method } from 'axios'
 
-export type UseForm = (instance?: AxiosInstance) => UseFormResponse
+export type UseForm = (instance?: CreateAxiosDefaults) => UseFormResponse
 
 export type UseFormResponse = {
   submitForm: SubmitForm
@@ -37,4 +37,4 @@ export type UseApiSubmit = {
 }
 
 export type AsyncApi = (endpoint: string, method?: Method, config?: RequestConfig) => Promise<any>
-export type UseApi = <D = any>(instance?: AxiosInstance) => UseApiResponse<D>
+export type UseApi = <D = any>(instance?: CreateAxiosDefaults) => UseApiResponse<D>

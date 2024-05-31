@@ -36,7 +36,7 @@ describe('UseApi with custom instance', () => {
   test('should handle successful API call, fetchData', async () => {
     mock.onGet('/get').reply(200, mockResponse)
 
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
     act(() => result.current.fetchData('/get'))
     expect(result.current.fetching).toBe(true)
 
@@ -52,7 +52,7 @@ describe('UseApi with custom instance', () => {
 
     mock.onPost('/post', body).reply(200, postResponse)
 
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
     act(() => result.current.mutate('/post', body))
     expect(result.current.fetching).toBe(true)
 
@@ -65,7 +65,7 @@ describe('UseApi with custom instance', () => {
 
   test('should handle successful API call, Mutate without body, Delete Method', async () => {
     mock.onDelete('/post?id=1', {}).reply(200, deleteResponse)
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
     act(() => result.current.mutate('/post?id=1', {}, { method: 'DELETE' }))
     expect(result.current.fetching).toBe(true)
 
@@ -78,7 +78,7 @@ describe('UseApi with custom instance', () => {
 
   test('should handle errors', async () => {
     mock.onAny('/long').networkError()
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
 
     act(() => result.current.mutate('/long'))
     expect(result.current.fetching).toBe(true)
@@ -115,7 +115,7 @@ describe('UseApi with custom instance', () => {
 describe('UseFormApi hook', () => {
   test('should handle successful Api call with submit form ', async () => {
     mock.onPost('/submit', formdata).reply(200, postResponse)
-    const { result } = renderHook(() => useFormApi(api))
+    const { result } = renderHook(() => useFormApi(api.defaults))
 
     act(() => {
       result.current.submitForm('/submit', formdata)

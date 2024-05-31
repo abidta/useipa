@@ -15,7 +15,7 @@ import { createConfig, defaultConfig } from './utils'
 import { ApiClientContext, ApiClientProvider } from './hook'
 
 const createClient = (config?: CreateAxiosDefaults) => {
-  const api: AxiosInstance = axios.create(config)
+  const api: AxiosInstance = axios.create(config || {})
   api.interceptors.response.use(
     (response) => {
       return response
@@ -41,14 +41,14 @@ export const useApiClient = () => {
 }
 
 // The core hook
-export const useApi: UseApi = (instance): UseApiResponse => {
+export const useApi: UseApi = (instanceConfig): UseApiResponse => {
   const [fetching, setFetching] = useState(false)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
 
   const hook = useApiClient()
-  const apiClient = instance || hook
+  const apiClient = instanceConfig ? createClient(instanceConfig) : hook
 
   let requestConfig: RequestConfig = {}
   const fetchData: FetchData = (endpoint, config) => {
