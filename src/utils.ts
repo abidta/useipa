@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { abortSignal } from './helper'
 import { RequestConfig } from './types'
 
@@ -11,3 +12,5 @@ export const createConfig = (req: RequestConfig, apiType?: ApiType) => {
 export const defaultConfig = (req?: RequestConfig): RequestConfig => {
   return { ...req, withCredentials: true, signal: abortSignal(3000) }
 }
+
+export const instance = axios

@@ -1,5 +1,4 @@
-import { useState } from 'react'
-import { AxiosResponse } from 'axios'
+import { useContext, useState } from 'react'
 import {
   AsyncApi,
   FetchData,
@@ -11,27 +10,45 @@ import {
   UseForm,
   UseFormResponse,
 } from './types'
-import axios, { AxiosInstance } from 'axios'
+import axios, { AxiosInstance, AxiosResponse, CreateAxiosDefaults } from 'axios'
 import { createConfig, defaultConfig } from './utils'
+import { ApiClientContext, ApiClientProvider } from './hook'
 
-export const api: AxiosInstance = axios.create()
-api.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  (error) => {
-    console.log('error', error.message)
-    const errObj = error?.response
+const createClient = (config?: CreateAxiosDefaults) => {
+  const api: AxiosInstance = axios.create(config)
+  api.interceptors.response.use(
+    (response) => {
+      return response
+    },
+    (error) => {
+      console.log('error', error.message)
+      const errObj = error?.response
 
-    return Promise.reject(errObj ?? error)
+      return Promise.reject(errObj ?? error)
+    }
+  )
+  return api
+}
+export const api = createClient()
+
+// This for only for hooks not asyncApi
+export const useApiClient = () => {
+  const context = useContext(ApiClientContext || null)
+  if (!context) {
+    return createClient()
   }
-)
+  return createClient(context)
+}
 
-export const useApi: UseApi = <T>(): UseApiResponse<T> => {
+// The core hook
+export const useApi: UseApi = (instance): UseApiResponse => {
   const [fetching, setFetching] = useState(false)
   const [data, setData] = useState(null)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(false)
+
+  const hook = useApiClient()
+  const apiClient = instance || hook
 
   let requestConfig: RequestConfig = {}
   const fetchData: FetchData = (endpoint, config) => {
@@ -63,7 +80,7 @@ export const useApi: UseApi = <T>(): UseApiResponse<T> => {
         requestConfig = endpointOrConfig
       }
 
-      const { data: response } = await api({ ...requestConfig })
+      const { data: response } = await apiClient({ ...requestConfig })
       if (response) {
         setSuccess(true)
         setData(response)
@@ -86,8 +103,9 @@ export const useApi: UseApi = <T>(): UseApiResponse<T> => {
   }
 }
 
-export const useFormApi: UseForm = (): UseFormResponse => {
-  const { data, fetching, error, success, submitApi } = useApi()
+// Form hook. this extends useApi states and omit fetchData and mutate methods.
+export const useFormApi: UseForm = (instance): UseFormResponse => {
+  const { data, fetching, error, success, submitApi } = useApi(instance)
 
   /**
    *
@@ -108,6 +126,7 @@ export const useFormApi: UseForm = (): UseFormResponse => {
 }
 
 /**
+ * This for directly call apis without hooks and states.
  *
  * @param {string} endpoint
  * @param {string} [method=GET]
@@ -119,6 +138,10 @@ export const asyncApi: AsyncApi = async (
   method = 'GET',
   config?: RequestConfig
 ) => {
-  const { data } = await api({ ...config, url: endpoint, method })
+  const apiClient = api
+
+  const { data } = await apiClient({ ...config, url: endpoint, method })
   return data
 }
+
+export { ApiClientProvider }
