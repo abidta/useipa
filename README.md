@@ -28,7 +28,6 @@ Setting Up `ApiClientProvider`
 First, import the necessary components and set up your ApiClientProvider with the desired configuration.Within any child component, you can use the [useApi](#useapi-the-core-hook) hook to access the configured Axios instance.
 
 ```tsx
-import React from 'react';
 import { ApiClientProvider } from 'useipa';
 
 const apiClientConfig = {
@@ -120,9 +119,8 @@ export default MutateComponent
 The [ApiClientProvider](#apiclientprovider) allows you to configure and manage a centralized Axios instance for all your API requests. If no configuration is provided, a default instance is used. Alternatively, you can explicitly pass an `instanceConfig` argument to the [`useApi`](#useapi-the-core-hook) hook to override the default or context-provided instance.
 Example:
 ```tsx
-import React from 'react';
+import { useEffect } from 'react'
 import { ApiClientProvider, useApi } from 'useipa';
-import axios from 'axios';
 
 const apiClientConfig = {
   baseURL: 'https://api.example.com',
@@ -141,14 +139,10 @@ const App = () => {
 };
 
 const YourComponent = () => {
-  const { fetching, data, error, mutate } = useApi();
+  const { fetching, data, error, fetchData } = useApi();
 
-  const fetchData = async () => {
-    await mutate('/default-endpoint', { method: 'GET' });
-  };
-
-  React.useEffect(() => {
-    fetchData();
+  useEffect(() => {
+    fetchData('/users');
   }, []);
 
   if (fetching) return <div>Loading...</div>;
@@ -160,14 +154,10 @@ const YourComponent = () => {
 const AnotherComponent = () => {
   const customConfig = { baseURL: 'https://custom-api.example.com' };
  // override ApiClientProvider Instance
-  const { fetching, data, error, mutate } = useApi(customConfig);
+  const { fetching, data, error, fetchData } = useApi(customConfig);
 
-  const fetchData = async () => {
-    await mutate('/custom-endpoint', { method: 'GET' });
-  };
-
-  React.useEffect(() => {
-    fetchData();
+  useEffect(() => {
+    fetchData('/users');
   }, []);
 
   if (fetching) return <div>Loading...</div>;
