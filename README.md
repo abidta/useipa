@@ -1,6 +1,8 @@
-[![npm version](https://img.shields.io/npm/v/useipa.svg?style=flat-square)](https://www.npmjs.org/package/useipa)
+[![npm version](https://img.shields.io/npm/v/useipa?color=brightgreen&label=npm%20package)](https://www.npmjs.org/package/useipa)
 &nbsp;
-[![Build status](https://img.shields.io/github/actions/workflow/status/abidta/useipa/CI.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/abidta/useipa/actions/workflows/ci.yml)
+[![Build status](https://img.shields.io/github/actions/workflow/status/abidta/useipa/CI.yml?branch=main&label=CI&logo=github)](https://github.com/abidta/useipa/actions/workflows/ci.yml)
+&nbsp;
+[![MIT license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/abidta/useipa/blob/main/LICENSE)
 
  # useipa Package
 
