@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useState } from 'react'
 import {
   AsyncApi,
   FetchData,
@@ -12,12 +12,15 @@ import {
 } from './types'
 import axios, { AxiosInstance, AxiosResponse, CreateAxiosDefaults } from 'axios'
 import { createConfig, defaultConfig } from './utils'
-import { ApiClientContext, ApiClientProvider } from './hook'
+import { ApiClientProvider } from './Provider'
+import { useApiClient } from './hook'
 
-const createClient = (config?: CreateAxiosDefaults) => {
+export const createClient = (config?: CreateAxiosDefaults) => {
   const api: AxiosInstance = axios.create(config || {})
   api.interceptors.response.use(
     (response) => {
+      console.log(response.config)
+
       return response
     },
     (error) => {
@@ -32,13 +35,6 @@ const createClient = (config?: CreateAxiosDefaults) => {
 export const api = createClient()
 
 // This for only for hooks not asyncApi
-export const useApiClient = () => {
-  const context = useContext(ApiClientContext || null)
-  if (!context) {
-    return createClient()
-  }
-  return createClient(context)
-}
 
 // The core hook
 export const useApi: UseApi = (instanceConfig): UseApiResponse => {
