@@ -2,7 +2,7 @@
 &nbsp;
 [![Build status](https://img.shields.io/github/actions/workflow/status/abidta/useipa/CI.yml?branch=main&label=CI&logo=github&style=flat-square)](https://github.com/abidta/useipa/actions/workflows/ci.yml)
 
-# useipa Package
+ # useipa Package
 
 ### A Powerful and Lightweight React Hook for Managing API Calls and Forms
 
@@ -19,6 +19,33 @@ yarn add useipa
 ```
 
 ## Usage
+
+### `ApiClientProvider`
+
+Setting Up `ApiClientProvider`
+First, import the necessary components and set up your ApiClientProvider with the desired configuration.Within any child component, you can use the [useApi](#useapi-the-core-hook) hook to access the configured Axios instance.
+
+```tsx
+import React from 'react';
+import { ApiClientProvider } from 'useipa';
+
+const apiClientConfig = {
+  baseURL: 'https://api.example.com',
+  headers: {
+    Authorization: 'Bearer YOUR_ACCESS_TOKEN',
+  },
+};
+
+const App = () => {
+  return (
+    <ApiClientProvider client={apiClientConfig}>
+      <YourComponent />
+    </ApiClientProvider>
+  );
+};
+
+export default App;
+```
 
 ### `useApi` The Core Hook
 
@@ -86,6 +113,68 @@ const MutateComponent = () => {
 }
 
 export default MutateComponent
+```
+
+The [ApiClientProvider](#apiclientprovider) allows you to configure and manage a centralized Axios instance for all your API requests. If no configuration is provided, a default instance is used. Alternatively, you can explicitly pass an `instanceConfig` argument to the [`useApi`](#useapi-the-core-hook) hook to override the default or context-provided instance.
+Example:
+```tsx
+import React from 'react';
+import { ApiClientProvider, useApi } from 'useipa';
+import axios from 'axios';
+
+const apiClientConfig = {
+  baseURL: 'https://api.example.com',
+  headers: {
+    Authorization: 'Bearer YOUR_ACCESS_TOKEN',
+  },
+};
+
+const App = () => {
+  return (
+    <ApiClientProvider client={apiClientConfig}>
+      <YourComponent />
+      <AnotherComponent />
+    </ApiClientProvider>
+  );
+};
+
+const YourComponent = () => {
+  const { fetching, data, error, mutate } = useApi();
+
+  const fetchData = async () => {
+    await mutate('/default-endpoint', { method: 'GET' });
+  };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (fetching) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>Data: {JSON.stringify(data)}</div>;
+};
+
+const AnotherComponent = () => {
+  const customConfig = { baseURL: 'https://custom-api.example.com' };
+ // override ApiClientProvider Instance
+  const { fetching, data, error, mutate } = useApi(customConfig);
+
+  const fetchData = async () => {
+    await mutate('/custom-endpoint', { method: 'GET' });
+  };
+
+  React.useEffect(() => {
+    fetchData();
+  }, []);
+
+  if (fetching) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+
+  return <div>Data: {JSON.stringify(data)}</div>;
+};
+
+export default App;
 ```
 
 ### `useFormApi` Hook
@@ -195,8 +284,9 @@ export default AsyncComponent
   - `fetching`: A boolean indicating if the request is in progress.
   - `error`: An error object if the request fails.
   - `success`: A boolean indicating if the request was successful.
-
-  **Methods:**
+- **Parameters:**
+  - `instanceConfig?` : AxiosInstanceConfig
+-  **Methods:**
 
   - `fetchData(endpoint, config?)`: Fetches data from an API endpoint. - `endpoint`: The URL of the API endpoint. - `config `(optional): An object containing configuration options like headers or method (defaults to `GET`).
     <br>
@@ -215,7 +305,8 @@ export default AsyncComponent
 ### `useFormApi`
 
 - **State and Methods:** Inherits all state and methods from `useApi`.
-
+- **Parameters:**
+  - `instanceConfig?` : AxiosInstanceConfig
 - **Methods:**
   - `submitForm(endpoint: string, inputData: object,config?)`: Submit form data to the specified endpoint using the POST method.
 
@@ -247,6 +338,9 @@ fetchData('/api/data', config)
 
 `useApi` logs errors to the console by default. You can implement custom error handling in your component.
 The `error` property in `useApi` and `useFormApi` stores the error object for programmatic handling.
+
+## Contributing
+If you encounter any issues or have suggestions for improvements, please open an issue or submit a pull request on [GitHub](https://github.com/abidta/useipa).
 
 ## Conclusion
 
