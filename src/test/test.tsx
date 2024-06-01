@@ -1,10 +1,21 @@
 import { renderHook, act, waitFor } from '@testing-library/react'
-import { api, asyncApi, useApi, useFormApi } from '../'
+import { ApiClientProvider, api, asyncApi, useApi, useFormApi } from '../'
 import MockAdapter from 'axios-mock-adapter'
 import '@testing-library/jest-dom'
+import { useApiClient } from '../hook'
+import axios from 'axios'
+import { UseApiResponse, UseFormResponse } from '../types'
+
+// ckeckSuccess function params type
+type ResponseType = typeof postResponse | typeof deleteResponse | typeof fetchResponse
+type Result = {
+  current: UseApiResponse<ResponseType> | UseFormResponse
+}
+
+jest.mock('../hook')
 
 let mock: MockAdapter
-const mockResponse = {
+const fetchResponse = {
   userId: 1,
   id: 1,
   title: 'delectus aut autem',
@@ -24,6 +35,7 @@ describe('UseApi with custom instance', () => {
   afterEach(() => {
     mock.reset()
   })
+
   test('should return the initial values for data, error and loading', async () => {
     const { result } = renderHook(() => useApi())
     const { data, fetching, error, success } = result.current
@@ -34,16 +46,14 @@ describe('UseApi with custom instance', () => {
   })
 
   test('should handle successful API call, fetchData', async () => {
-    mock.onGet('/get').reply(200, mockResponse)
+    mock.onGet('/get').reply(200, fetchResponse)
 
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
     act(() => result.current.fetchData('/get'))
     expect(result.current.fetching).toBe(true)
 
     await waitFor(() => {
-      expect(result.current.success).toBe(true)
-      expect(result.current.data).toEqual(mockResponse)
-      expect(result.current.error).toBe(null)
+      checkSuccess(result, fetchResponse)
     })
   })
 
@@ -52,33 +62,29 @@ describe('UseApi with custom instance', () => {
 
     mock.onPost('/post', body).reply(200, postResponse)
 
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
     act(() => result.current.mutate('/post', body))
     expect(result.current.fetching).toBe(true)
 
     await waitFor(() => {
-      expect(result.current.success).toBe(true)
-      expect(result.current.data).toEqual(postResponse)
-      expect(result.current.error).toBe(null)
+      checkSuccess(result)
     })
   })
 
   test('should handle successful API call, Mutate without body, Delete Method', async () => {
     mock.onDelete('/post?id=1', {}).reply(200, deleteResponse)
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
     act(() => result.current.mutate('/post?id=1', {}, { method: 'DELETE' }))
     expect(result.current.fetching).toBe(true)
 
     await waitFor(() => {
-      expect(result.current.success).toBe(true)
-      expect(result.current.data).toEqual(deleteResponse)
-      expect(result.current.error).toBe(null)
+      checkSuccess(result, deleteResponse)
     })
   })
 
   test('should handle errors', async () => {
     mock.onAny('/long').networkError()
-    const { result } = renderHook(() => useApi(api))
+    const { result } = renderHook(() => useApi(api.defaults))
 
     act(() => result.current.mutate('/long'))
     expect(result.current.fetching).toBe(true)
@@ -91,40 +97,51 @@ describe('UseApi with custom instance', () => {
   })
 })
 
-// describe('ApiClientProvider wrapper', () => {
-//   test('should handle successful Api call with ApiClientPeovider wrapper', async () => {
-//     const mockedClient = useApiClient as jest.MockedFunction<typeof useApiClient>
-//     const hook = new MockAdapter(api)
-//     mockedClient.mockReturnValue(api)
-//     mock.onPost('/provider').reply(200, postResponse)
-//     const { result } = renderHook(() => useApi(), {
-//       wrapper: ({ children }) => <ApiClientProvider client={hook}>{children}</ApiClientProvider>,
-//     })
-//     act(() => {
-//       result.current.mutate('/submit', formdata)
-//     })
-//     expect(result.current.fetching).toBe(true)
-//     await waitFor(() => {
-//       expect(result.current.success).toBe(true)
-//       expect(result.current.data).toEqual(postResponse)
-//       expect(result.current.error).toBe(null)
-//     })
-//   })
-// })
+describe('ApiClientProvider wrapper', () => {
+  test('should handle successful Api call with ApiClientProvider wrapper', async () => {
+    const mockedClient = useApiClient as jest.MockedFunction<typeof useApiClient>
+    mockedClient.mockReturnValue(api)
+    mock.onPost('/provider', formdata).reply(200, postResponse)
+    const { result } = renderHook(() => useApi(), {
+      wrapper: ({ children }) => (
+        <ApiClientProvider client={api.defaults}>{children}</ApiClientProvider>
+      ),
+    })
+    act(() => {
+      result.current.mutate('/provider', formdata)
+    })
+    expect(result.current.fetching).toBe(true)
+    await waitFor(() => {
+      checkSuccess(result)
+    })
+  })
+})
+
+describe('Without Provider and instance config, raw call', () => {
+  test('should handle successful Api call without Provide and instance config', async () => {
+    mock.onPost('/raw', formdata).reply(200, postResponse)
+    const { result } = renderHook(() => useApi())
+    act(() => {
+      result.current.mutate('/raw', formdata)
+    })
+    expect(result.current.fetching).toBe(true)
+    await waitFor(() => {
+      checkSuccess(result)
+    })
+  })
+})
 
 describe('UseFormApi hook', () => {
   test('should handle successful Api call with submit form ', async () => {
     mock.onPost('/submit', formdata).reply(200, postResponse)
-    const { result } = renderHook(() => useFormApi(api))
+    const { result } = renderHook(() => useFormApi(api.defaults))
 
     act(() => {
       result.current.submitForm('/submit', formdata)
     })
     expect(result.current.fetching).toBe(true)
     await waitFor(() => {
-      expect(result.current.success).toBe(true)
-      expect(result.current.data).toEqual(postResponse)
-      expect(result.current.error).toBe(null)
+      checkSuccess(result)
     })
   })
 })
@@ -136,3 +153,29 @@ describe('asyncApi check', () => {
     expect(data).toEqual(postResponse)
   })
 })
+
+describe('Without Provider and with instance config,', () => {
+  test('should handle successful Api call without Provide and with instance config', async () => {
+    mock = new MockAdapter(axios)
+    mock.onPost('/raw', formdata).reply(200, postResponse)
+    const { result } = renderHook(() =>
+      useApi({
+        baseURL: 'api.com',
+        headers: { test: 'test', 'Content-Type': 'multiprt/formdata' },
+      })
+    )
+    act(() => {
+      result.current.mutate('/raw', formdata)
+    })
+    expect(result.current.fetching).toBe(true)
+    await waitFor(() => {
+      checkSuccess(result)
+    })
+  })
+})
+
+function checkSuccess(result: Result, response: ResponseType = postResponse) {
+  expect(result.current.success).toBe(true)
+  expect(result.current.data).toEqual(response)
+  expect(result.current.error).toBe(null)
+}
