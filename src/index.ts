@@ -19,8 +19,6 @@ export const createClient = (config?: CreateAxiosDefaults) => {
   const api: AxiosInstance = axios.create(config || {})
   api.interceptors.response.use(
     (response) => {
-      console.log(response.config)
-
       return response
     },
     (error) => {
@@ -54,6 +52,10 @@ export const useApi: UseApi = (instanceConfig): UseApiResponse => {
     submitApi(endpoint, createConfig({ ...config, data }, 'mutate'))
   }
 
+  const clearState = () => {
+    setSuccess(false)
+    setError(null)
+  }
   /**
    *
    * @param {(string|object)} endpointOrConfig
@@ -93,6 +95,7 @@ export const useApi: UseApi = (instanceConfig): UseApiResponse => {
     error,
     fetching,
     success,
+    clearState,
     fetchData,
     mutate,
     submitApi,
@@ -101,7 +104,7 @@ export const useApi: UseApi = (instanceConfig): UseApiResponse => {
 
 // Form hook. this extends useApi states and omit fetchData and mutate methods.
 export const useFormApi: UseForm = (instance): UseFormResponse => {
-  const { data, fetching, error, success, submitApi } = useApi(instance)
+  const { data, fetching, error, success, submitApi, clearState } = useApi(instance)
 
   /**
    *
@@ -117,6 +120,7 @@ export const useFormApi: UseForm = (instance): UseFormResponse => {
     error,
     fetching,
     success,
+    clearState,
     submitForm,
   }
 }
@@ -141,3 +145,4 @@ export const asyncApi: AsyncApi = async (
 }
 
 export { ApiClientProvider }
+export type { CreateAxiosDefaults }
