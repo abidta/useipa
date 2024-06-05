@@ -8,14 +8,16 @@ export type UseFormResponse = {
   submitForm: SubmitForm
 } & Omit<UseApiResponse, 'submitApi' | 'mutate' | 'fetchData'>
 
+type TError = Error & { status?: number; statusText?: string }
 /**
  * Use api types
  */
 export type UseApiResponse<D = any> = {
   fetching: boolean
   data: D | null
-  error?: Error | null
+  error?: TError | null
   success: boolean
+  clearState: () => void
   fetchData: FetchData
   mutate: Mutate
   submitApi: UseApiSubmit
