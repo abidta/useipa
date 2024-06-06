@@ -33,8 +33,6 @@
     "axios",
     "useapi",
     "useipa"
-    "react-api",
-    "react-hook"
   ],
   "author": "Sainul Abid",
   "license": "MIT",
