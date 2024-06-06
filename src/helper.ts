@@ -1,5 +1,5 @@
-export function abortSignal(ms: number) {
+export function abortSignal(ms?: number) {
   const controller = new AbortController()
-  setTimeout(() => controller.abort(), ms || 5000)
+  setTimeout(() => controller.abort(), ms || 30000)
   return controller.signal
 }

@@ -69,7 +69,7 @@ export const useApi: UseApi = (instanceConfig): UseApiResponse => {
       setError(null)
       setFetching(true)
       if (typeof endpointOrConfig === 'string' && typeof config === 'object') {
-        requestConfig = { ...config, url: endpointOrConfig }
+        requestConfig = createConfig({ ...config, url: endpointOrConfig })
       }
       if (typeof endpointOrConfig === 'string' && !config) {
         requestConfig = defaultConfig({ url: endpointOrConfig })
