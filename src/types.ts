@@ -30,6 +30,7 @@ export type Mutate = (endpoint: string, data?: any, config?: RequestConfig) => v
 type SubmitForm = (endpoint: string, inputData: object) => void
 
 export type RequestConfig = {
+  signalTtl?: number
   identifier?: string
 } & AxiosRequestConfig
 
