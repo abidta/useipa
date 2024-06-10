@@ -10,7 +10,10 @@ export const createConfig = (req: RequestConfig, apiType?: ApiType) => {
   return defaultConfig(req)
 }
 export const defaultConfig = (req?: RequestConfig): RequestConfig => {
-  return { ...req, signal: abortSignal(req?.signalTtl) }
+  if (!req?.signal) {
+    return { ...req, signal: abortSignal(req?.signalTtl) }
+  }
+  return { ...req }
 }
 
 export const instance = axios
