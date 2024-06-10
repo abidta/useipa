@@ -1,6 +1,6 @@
 {
   "name": "useipa",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "A react hook for api fetching",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -33,8 +33,6 @@
     "axios",
     "useapi",
     "useipa"
-    "react-api",
-    "react-hook"
   ],
   "author": "Sainul Abid",
   "license": "MIT",
