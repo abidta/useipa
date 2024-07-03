@@ -131,16 +131,16 @@ export const useFormApi: UseForm = (instance): UseFormResponse => {
  * @param {string} endpoint
  * @param {string} [method=GET]
  * @param {RequestConfig} [config]
- * @returns {Promise<any>}
+ * @returns {Promise<T>}
  */
-export const asyncApi: AsyncApi = async (
+export const asyncApi: AsyncApi = async <T>(
   endpoint: string,
   method = 'GET',
   config?: RequestConfig
 ) => {
   const apiClient = api
 
-  const { data } = await apiClient({ ...config, url: endpoint, method })
+  const { data } = await apiClient<T>({ ...config, url: endpoint, method })
   return data
 }
 

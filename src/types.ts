@@ -39,5 +39,10 @@ export type UseApiSubmit = {
   (endpoint: string, config: RequestConfig): void
 }
 
-export type AsyncApi = (endpoint: string, method?: Method, config?: RequestConfig) => Promise<any>
+export type AsyncApi = <T = any>(
+  endpoint: string,
+  method?: Method,
+  config?: RequestConfig
+) => Promise<T>
+
 export type UseApi = <D = any>(instance?: CreateAxiosDefaults) => UseApiResponse<D>
