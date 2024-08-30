@@ -4,6 +4,8 @@ import { ApiClientContext } from './Provider'
 
 export const useApiClient = () => {
   const context = useContext(ApiClientContext)
+  console.log(context)
+
   if (!context) {
     return createClient()
   }
