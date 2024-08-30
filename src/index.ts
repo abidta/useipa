@@ -12,19 +12,20 @@ import {
 } from './types'
 import axios, { AxiosInstance, AxiosResponse, CreateAxiosDefaults } from 'axios'
 import { createConfig, defaultConfig } from './utils'
-import { ApiClientProvider } from './Provider'
+import { ApiClientProvider, BaseEvents } from './Provider'
 import { useApiClient } from './hook'
 
-export const createClient = (config?: CreateAxiosDefaults) => {
+export const createClient = (config?: CreateAxiosDefaults & { methods?: BaseEvents }) => {
   const api: AxiosInstance = axios.create(config || {})
   api.interceptors.response.use(
     (response) => {
+      config?.methods?.onSuccess && config.methods.onSuccess()
       return response
     },
     (error) => {
       console.log('error', error.message)
       const errObj = error?.response
-
+      config?.methods?.onError && config.methods.onError(error)
       return Promise.reject(errObj ?? error)
     }
   )
